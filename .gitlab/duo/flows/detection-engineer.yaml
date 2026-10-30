@@ -1,0 +1,87 @@
+# Detection engineer flow (draft, not yet run inside GitLab).
+# Trigger: assign the flow's service account to an issue that describes a suspicious email sample or behaviour.
+# It writes one new behaviour rule with its own test cases and leaves the result for the pipeline to judge.
+# Tool names marked "verify" were not in the published tool list; check them against GitLab's tools registry.
+version: "v1"
+environment: ambient
+
+components:
+  - name: "rule_writer"
+    type: AgentComponent
+    prompt_id: "rule_writer_prompt"
+    inputs:
+      - "context:goal"
+      - from: "context:project_id"
+        as: "project_id"
+    toolset:
+      - "get_issue"
+      - "find_files"
+      - "read_file"
+      - "list_dir"
+      - "create_file_with_contents"
+      - "edit_file"
+      - "run_command"
+    max_cycles: 60
+    ui_log_events: ["on_agent_final_answer", "on_tool_execution_failed"]
+
+  - name: "reviewer"
+    type: AgentComponent
+    prompt_id: "reviewer_prompt"
+    inputs:
+      - from: "context:rule_writer.final_answer"
+        as: "writer_summary"
+    toolset:
+      - "read_file"
+      - "run_command"
+      - "create_merge_request_note"
+    max_cycles: 30
+    ui_log_events: ["on_agent_final_answer"]
+
+prompts:
+  - prompt_id: "rule_writer_prompt"
+    name: "Rule writer"
+    unit_primitives: []
+    prompt_template:
+      system: |
+        You are a detection engineer for E-TAP, an email threat analysis platform.
+        The goal names an issue. Read it with get_issue.
+        Behaviour rules live in backend/sandbox/rules/*.toml and are documented in backend/sandbox/rules/README.md.
+        Read that README and two existing rules before writing anything.
+        If the E-TAP tools are available, call list_detection_rules first to avoid duplicating an existing rule.
+        Write exactly one new rule, original and described in your own words (never copy rules from other collections).
+        Pick the next free id (etap-NNN), give it a severity of high or medium, and include at least one [[tests]] case
+        that must match and one that must not match.
+        Then run: cd backend && python -m pytest tests/test_sandbox_rules.py -q
+        Fix the rule until that passes. Do not edit any other rule or any Python file.
+        Finish with a short summary: the rule id, what it detects, the tests, and anything you are unsure about,
+        and note that the rule counts in backend/sandbox/rules/README.md need a refresh.
+      user: |
+        Project ID: {{project_id}}
+        Goal: {{goal}}
+    params:
+      timeout: 300
+
+  - prompt_id: "reviewer_prompt"
+    name: "Rule reviewer"
+    unit_primitives: []
+    prompt_template:
+      system: |
+        You review a new E-TAP detection rule written by another agent.
+        Check that the rule is original, has matching and non-matching test cases, is not so broad that normal software
+        would trigger it, and that the full rule test file passes.
+        Post your findings as a merge request note, or as a plain summary if no merge request exists yet.
+        Say clearly whether you recommend merging, and what a human should look at first.
+      user: |
+        The rule writer reported:
+        {{writer_summary}}
+    params:
+      timeout: 300
+
+routers:
+  - from: "rule_writer"
+    to: "reviewer"
+  - from: "reviewer"
+    to: "end"
+
+flow:
+  entry_point: "rule_writer"

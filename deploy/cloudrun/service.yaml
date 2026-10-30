@@ -1,0 +1,68 @@
+# Cloud Run service for the E-TAP API (Knative format).
+# Placeholders in ${...} are filled in by deploy.sh; secrets come from Secret Manager, never from this file.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: etap-api
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        # Analysis jobs and rate limiters live in process memory, so never run more than one instance.
+        # Scales to zero when idle so an unused service costs nothing; jobs started in the background
+        # may stall while no request is open (untested).
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "1"
+    spec:
+      containerConcurrency: 20
+      timeoutSeconds: 300
+      containers:
+        - image: ${IMAGE}
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+          env:
+            - name: MONGO_DB_NAME
+              value: etap
+            - name: ALLOWED_ORIGINS
+              value: ${FRONTEND_ORIGIN}
+            - name: SANDBOX_BACKEND
+              value: agent
+            - name: THREAT_INTEL_LIVE
+              value: "1"
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: etap-mongodb-uri
+                  key: latest
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: etap-gemini-api-key
+                  key: latest
+            - name: VIRUSTOTAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: etap-virustotal-api-key
+                  key: latest
+            - name: ABUSEIPDB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: etap-abuseipdb-api-key
+                  key: latest
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 5
+            failureThreshold: 24
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30
