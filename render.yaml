@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: etap-clean-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    region: singapore
+    branch: main
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGO_DB_NAME
+        value: etap_clean
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: VIRUSTOTAL_API_KEY
+        sync: false
+      - key: ABUSEIPDB_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: THREAT_INTEL_LIVE
+        value: "1"
+      - key: ALLOWED_ORIGINS
+        sync: false
