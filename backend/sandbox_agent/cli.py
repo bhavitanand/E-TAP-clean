@@ -209,7 +209,7 @@ def cmd_setup(args, config: cfgmod.AgentConfig) -> cfgmod.AgentConfig:
             raise SystemExit("\nVirtualBox (or VMware Workstation Pro) is needed for deeper analysis. Install one, create "
                              "a Windows VM with Sysmon and a clean snapshot, then run setup again.")
         if not vms:
-            raise SystemExit("\nNo VirtualBox VM found for this Windows user.")
+            raise SystemExit("\nNo VirtualBox VM found for this Windows user. If your VM is in VMware Workstation, run setup --provider vmware.")
         vm.provider = "virtualbox"
         if imported.get("vboxmanage"):
             vm.vboxmanage = imported["vboxmanage"]

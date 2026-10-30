@@ -141,7 +141,7 @@ A Manifest V3 extension adds **Analyze in E-TAP** above an opened Gmail message.
 
 ## Using deeper attachment analysis, step by step
 
-Standard analysis never opens an attachment, and it is all most people need. **Deeper attachment analysis** is optional and opens attachments inside a virtual machine **you own**, watches what it does and adds that to the report. If you have no VM, skip this whole section: nothing else in E-TAP depends on it. This is the whole journey for someone using the hosted E-TAP with a Windows VM in VirtualBox.
+Standard analysis never opens an attachment, and it is all most people need. **Deeper attachment analysis** is optional and opens attachments inside a virtual machine **you own**, watches what it does and adds that to the report. If you have no VM, skip this whole section: nothing else in E-TAP depends on it. This is the whole journey for someone using the hosted E-TAP with a Windows VM in VirtualBox or VMware Workstation.
 
 ### What runs where
 | On your PC | On the E-TAP server |
@@ -166,7 +166,7 @@ On your PC you also need **Python 3.10 or newer** (from python.org, with "Add to
 
 ### 1. Choose Deeper
 - **On the website:** open **Analyze email** and drop the email file. Two cards appear: **Standard analysis** and **Deeper attachment analysis** (its *i* icon explains what it needs). Pick Deeper.
-- **In Gmail:** click the **Deeper attachment analysis** card on the E-TAP banner. If you have no VM, click **Standard analysis** instead (or *I don't have a VirtualBox VM* on the pairing screen).
+- **In Gmail:** click the **Deeper attachment analysis** card on the E-TAP banner. If you have no VM, click **Standard analysis** instead (or *I don't have a VirtualBox or VMware VM* on the pairing screen).
 
 The first time, it says **Your sandbox: not paired** and shows three steps.
 

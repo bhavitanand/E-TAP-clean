@@ -27,3 +27,5 @@ services:
         value: "1"
       - key: ALLOWED_ORIGINS
         sync: false
+      - key: PUBLIC_API_URL
+        value: https://etap-clean-backend.onrender.com

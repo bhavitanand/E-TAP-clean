@@ -57,7 +57,7 @@ export function hasSandbox(report = {}) {
   return Boolean(sb) && SANDBOX_RUN_MODES.has(sb.mode) && !['not_requested', 'unavailable'].includes(sb.status);
 }
 
-/** What the VirtualBox sandbox observed, as evidence items (category "sandbox"). */
+/** What the VM sandbox observed, as evidence items (category "sandbox"). */
 export function sandboxItems(report = {}) {
   if (!hasSandbox(report)) return [];
   const items = [];

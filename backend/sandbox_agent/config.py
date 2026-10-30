@@ -15,7 +15,19 @@ from pathlib import Path
 
 from .protect import seal, unseal
 
-DEFAULT_SERVER = "https://etap-clean-backend.onrender.com"
+FALLBACK_SERVER = "https://etap-clean-backend.onrender.com"
+
+
+def bundled_server() -> str:
+    """The server this agent was downloaded from (server_url.txt in the zip), else the fallback."""
+    try:
+        text = Path(__file__).with_name("server_url.txt").read_text(encoding="utf-8").strip()
+    except OSError:
+        return FALLBACK_SERVER
+    return text.rstrip("/") if text.startswith(("http://", "https://")) else FALLBACK_SERVER
+
+
+DEFAULT_SERVER = bundled_server()
 
 
 def config_dir() -> Path:
