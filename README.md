@@ -2,14 +2,14 @@
 
 **One tap from a suspicious email to an evidence-backed verdict.**
 
-E-TAP takes a raw email (`.eml` / `.msg`, or a message opened in Gmail through the browser extension) and runs it through a multi-stage forensic pipeline: header and authentication forensics, sender-origin tracing with IP geolocation, static attachment forensics (file signatures, macros, QR codes, OCR), IOC extraction, live threat-intelligence lookups, historical campaign correlation, graph-based risk propagation, an XGBoost pre-filter and a Gemini-backed final assessment with MITRE ATT&CK mapping. For people who own a VirtualBox VM there is an optional **deeper attachment analysis** that opens the attachments in that VM and adds what they actually did to the report.
+E-TAP takes a raw email (`.eml` / `.msg`, or a message opened in Gmail through the browser extension) and runs it through a multi-stage forensic pipeline: header and authentication forensics, sender-origin tracing with IP geolocation, static attachment forensics (file signatures, macros, QR codes, OCR), IOC extraction, live threat-intelligence lookups, historical campaign correlation, graph-based risk propagation, an XGBoost pre-filter and a Gemini-backed final assessment with MITRE ATT&CK mapping. For people who own a VirtualBox or VMware Workstation VM there is an optional **deeper attachment analysis** that opens the attachments in that VM and adds what they actually did to the report.
 
 The result is one report that says **how risky the email is, why, and what to do**, written so a non-expert can act on it, with the full technical detail kept for security analysts.
 
 > E-TAP is a triage assistant, not an oracle. A missing or failed check is always reported as *unknown*, never as *safe*.
 
-- **Live demo (frontend):** <https://e-tap-lac.vercel.app/>
-- **Backend API:** <https://etap-backend-od1c.onrender.com> · [health](https://etap-backend-od1c.onrender.com/health) · [docs](https://etap-backend-od1c.onrender.com/docs)
+- **Live demo (frontend):** <https://e-tap-clean.vercel.app/>
+- **Backend API:** <https://etap-clean-backend.onrender.com> · [health](https://etap-clean-backend.onrender.com/health) · [docs](https://etap-clean-backend.onrender.com/docs)
 
 For the deep technical reference (every module, library, environment variable, data shape and design decision), read **[CONTEXT.md](CONTEXT.md)**.
 

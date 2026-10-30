@@ -1,6 +1,6 @@
 const ETAP_CONFIG = Object.freeze({
     version: '1.6.1',
-    apiBaseUrl: 'https://etap-backend-od1c.onrender.com',
-    appBaseUrl: 'https://e-tap-lac.vercel.app',
+    apiBaseUrl: 'https://etap-clean-backend.onrender.com',
+    appBaseUrl: 'https://e-tap-clean.vercel.app',
     requestTimeoutMs: 90000,
 });
