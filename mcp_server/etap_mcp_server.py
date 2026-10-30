@@ -1,4 +1,4 @@
-"""E-TAP MCP server: lets an AI agent (for example a GitLab Duo agent) use E-TAP as a tool.
+"""E-TAP MCP server: lets an AI agent (for example an IDE assistant) use E-TAP as a tool.
 
 Speaks the Model Context Protocol over stdio (newline-delimited JSON-RPC 2.0). Standard library only,
 Python 3.11+. Configure the API with ETAP_API_URL (default http://127.0.0.1:5000).

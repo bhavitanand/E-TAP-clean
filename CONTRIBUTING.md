@@ -2,7 +2,7 @@
 
 ## Running the tests
 
-The commands below are the ones the pipeline in `.gitlab-ci.yml` runs.
+Run these before you open a pull request.
 
 **Backend** (Python 3.11). The tests need `tesseract-ocr` and `libzbar0` installed on your system.
 
@@ -26,7 +26,7 @@ The commands below are the ones the pipeline in `.gitlab-ci.yml` runs.
 1. Fork the project and create a branch from `main`.
 2. Make a small, focused change and add or update tests for it.
 3. Run the tests above for the parts you touched.
-4. Open a merge request that says what changed and why.
+4. Open a pull request that says what changed and why.
 
 Changes to the behaviour rules in `backend/sandbox/rules/` also have their own tests:
 

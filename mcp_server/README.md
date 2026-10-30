@@ -8,8 +8,21 @@ Lets an AI agent use E-TAP as a tool over the Model Context Protocol (stdio). St
 | `get_report` | Fetches a stored report by `email_id`. |
 | `list_detection_rules` | Lists the behaviour rules (id, name, severity, ATT&CK ids). Works without the API. |
 
-## Use with GitLab Duo
-`.gitlab/duo/mcp.json` registers the server for the project. Replace `ETAP_API_URL` with the Cloud Run API address after deploying (`deploy/cloudrun/`). Duo asks you to approve each tool per session unless `approvedTools` is set.
+## Use with an MCP client
+Most MCP clients accept a stdio server entry like this. Set `ETAP_API_URL` to your E-TAP API (the default is `http://127.0.0.1:5000`).
+```json
+{
+  "mcpServers": {
+    "etap": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["mcp_server/etap_mcp_server.py"],
+      "env": { "ETAP_API_URL": "http://127.0.0.1:5000" }
+    }
+  }
+}
+```
+Clients usually ask you to approve each tool before it runs.
 
 ## Try it by hand
 ```bash
@@ -23,4 +36,4 @@ python mcp_server/etap_mcp_server.py
 - Tests: `backend/tests/test_mcp_server.py` (a stand-in API and a real stdio round trip).
 
 ## Not verified
-Never connected to a real GitLab Duo session (account approval pending). The config follows GitLab's documented `.gitlab/duo/mcp.json` format.
+Only tested against a stand-in API and a real stdio round trip; it has not been connected to a production MCP client session.
