@@ -53,7 +53,7 @@ Menu names change now and then, so follow the idea if a label differs slightly.
    | `META_ACCESS_TOKEN` | the access token (see "Token that does not expire" below) |
    | `META_APP_SECRET` | the App secret from step 3 |
    | `META_VERIFY_TOKEN` | any secret string you make up, e.g. a long random phrase |
-   | `PUBLIC_FRONTEND_URL` | `https://e-tap-clean.vercel.app` (used in report links) |
+   | `PUBLIC_FRONTEND_URL` | `https://etap-phish.vercel.app` (used in report links) |
 
 5. Back in the dashboard open **WhatsApp > Configuration**. Under **Webhook**, click **Edit** and enter:
    - **Callback URL:** `https://etap-clean-backend.onrender.com/whatsapp/meta`

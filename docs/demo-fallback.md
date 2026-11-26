@@ -29,7 +29,7 @@ locked"). Do not claim the bot replies. Say what is true:
    to show the live timeline.
 4. **Be upfront about the limit.** The bot is one-way until Meta verification clears (needs legal business
    documents and a payment method; nothing in our code changes).
-5. **Privacy page and sign-in.** `https://e-tap-clean.vercel.app/privacy.html`; the phone number is
+5. **Privacy page and sign-in.** `https://etap-phish.vercel.app/privacy.html`; the phone number is
    stored only as a keyed hash.
 
 ## If something goes wrong
