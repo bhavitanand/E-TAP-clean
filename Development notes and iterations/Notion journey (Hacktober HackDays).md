@@ -8,7 +8,7 @@ Hacktober HackDays 2026 · Tech for Social Good · Open source (MIT) · Built wi
 
 | What | Where |
 |---|---|
-| Live app | https://e-tap-azure.vercel.app |
+| Live app | https://etap-phish.vercel.app |
 | Backend API (health, docs) | https://etap-backend-2std.onrender.com/health and https://etap-backend-2std.onrender.com/docs |
 | Source code (MIT licensed) | https://github.com/Krish-Anand-dev/E-TAP |
 | Technical reference | CONTEXT.md in the repository |
