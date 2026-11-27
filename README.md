@@ -9,6 +9,7 @@ The result is one report that says **how risky the email is, why, and what to do
 > E-TAP is a triage assistant, not an oracle. A missing or failed check is always reported as *unknown*, never as *safe*.
 
 - **Live demo (frontend):** <https://etap-phish.vercel.app/>
+- **Version history:** [CHANGELOG.md](CHANGELOG.md) and [releases](https://github.com/bhavitanand/E-TAP-clean/releases)
 - **Backend API:** <https://etap-clean-backend.onrender.com> · [health](https://etap-clean-backend.onrender.com/health) · [docs](https://etap-clean-backend.onrender.com/docs)
 
 ## Built for Hacktober HackDays: tech for social good
