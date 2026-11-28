@@ -19,7 +19,7 @@ import unicodedata
 from difflib import SequenceMatcher
 from typing import Optional, Dict, List
 
-from .brand_domains import COMMONLY_IMPERSONATED_DOMAINS, get_brand_root
+from .brand_domains import COMMONLY_IMPERSONATED_DOMAINS, get_brand_root, known_brand_domain
 
 
 def levenshtein_distance(a: str, b: str) -> int:
@@ -97,6 +97,24 @@ def has_mixed_scripts(text: str) -> bool:
     return len(scripts_seen) > 1 and "LATIN" in scripts_seen
 
 
+# Digits that stand in for letters in lookalike names: "faceb00k", "paypa1", "g00gle".
+# A digit "1" can be an "l" or an "i", so both readings are tried.
+_DIGIT_LETTERS = {"0": "o", "3": "e", "4": "a", "5": "s", "7": "t"}
+
+
+def _digit_swap_variants(root: str) -> List[str]:
+    """The names a reader could take `root` for once digits are read as letters.
+
+    Empty when the name has no such digit, so ordinary names cost nothing.
+    """
+    if not any(ch in _DIGIT_LETTERS or ch == "1" for ch in root):
+        return []
+    base = "".join(_DIGIT_LETTERS.get(ch, ch) for ch in root)
+    variants = {base.replace("1", "l"), base.replace("1", "i")}
+    variants.discard(root)
+    return sorted(variants)
+
+
 def find_lookalike_brand(domain: str, threshold: float = 0.80) -> Optional[Dict]:
     """
     Compares the given domain's "brand root" against every entry in our
@@ -104,14 +122,26 @@ def find_lookalike_brand(domain: str, threshold: float = 0.80) -> Optional[Dict]
     enough but NOT an exact match (exact match = legitimately that brand,
     not a lookalike of it).
 
+    A domain a brand genuinely sends from (see KNOWN_BRAND_DOMAINS, e.g.
+    facebookmail.com) is not a lookalike. Digits read as letters count too, so
+    "faceb00k.com" matches "facebook.com".
+
     Returns:
         {"brand": "paypal.com", "similarity": 0.92, "edit_distance": 1}
         or None if nothing suspicious found.
     """
+    if known_brand_domain(domain):
+        return None
+
     candidate_root = get_brand_root(domain)
     best_match = None
     best_score = 0.0
+    swapped_roots = _digit_swap_variants(candidate_root)
     candidate_tokens = {token for token in re.split(r"[-_.]+", candidate_root) if token}
+    # The same tokens as a reader may see them with digits read as letters.
+    readable_tokens = set(candidate_tokens)
+    for swapped in swapped_roots:
+        readable_tokens |= {token for token in re.split(r"[-_.]+", swapped) if token}
     lure_terms = {
         "secure", "security", "verify", "verification", "login", "logon",
         "signin", "sign-in", "account", "accounts", "support", "billing",
@@ -130,7 +160,7 @@ def find_lookalike_brand(domain: str, threshold: float = 0.80) -> Optional[Dict]
         # edit-distance similarity alone misses e.g. paypal-secure.com and
         # secure-paypal-login.com. Require both an exact brand token and a
         # context token to avoid broad substring matches against ordinary firms.
-        if len(brand_root) >= 4 and brand_root in candidate_tokens and candidate_lures:
+        if len(brand_root) >= 4 and brand_root in readable_tokens and candidate_lures:
             score = 1.0
             match = {
                 "brand": brand_domain,
@@ -144,13 +174,20 @@ def find_lookalike_brand(domain: str, threshold: float = 0.80) -> Optional[Dict]
             continue
 
         score = similarity_ratio(candidate_root, brand_root)
+        match_type = "typosquat"
+        for swapped in swapped_roots:
+            # "faceb00k" read with letters is exactly "facebook".
+            swapped_score = 1.0 if swapped == brand_root else similarity_ratio(swapped, brand_root)
+            if swapped_score > score:
+                score = swapped_score
+                match_type = "character_swap" if swapped == brand_root else "typosquat"
         if score >= threshold and score > best_score:
             best_score = score
             best_match = {
                 "brand": brand_domain,
                 "similarity": round(score, 3),
                 "edit_distance": levenshtein_distance(candidate_root, brand_root),
-                "match_type": "typosquat",
+                "match_type": match_type,
                 "lure_terms": [],
             }
 
@@ -231,6 +268,7 @@ def analyze_domain(sender_domain: str, display_name: Optional[str] = None) -> Di
         "lookalike_brand": None,
         "display_name_brand_mentions": [],
         "display_name_domain_mismatch": False,
+        "known_brand_domain": None,
         "flags": [],
     }
 
@@ -252,6 +290,12 @@ def analyze_domain(sender_domain: str, display_name: Optional[str] = None) -> Di
         # rare but possible depending on mail client handling
         result["homograph_suspected"] = True
         result["flags"].append("homograph_attack_suspected")
+
+    # --- a genuine brand mail domain is recorded, never flagged. This is not a
+    # safety verdict: sender authentication and the other checks still decide. ---
+    brand_of_known = known_brand_domain(sender_domain)
+    if brand_of_known:
+        result["known_brand_domain"] = {"domain": sender_domain, "brand": brand_of_known}
 
     # --- typosquat / lookalike brand ---
     lookalike = find_lookalike_brand(sender_domain)

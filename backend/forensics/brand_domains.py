@@ -40,6 +40,36 @@ COMMONLY_IMPERSONATED_DOMAINS = [
 ]
 
 
+# Genuine domains that brands (or their mail providers) really send from, but whose
+# names merely *resemble* a brand in the list above. Without this, edit-distance
+# matching calls them lookalikes: "facebookmail" is 0.80 similar to "facebook".
+#
+# Being on this list only means "do not call it a lookalike". It never marks an
+# email safe: sender authentication, links, attachments and everything else are
+# still judged on their own. Keep it short and only add domains that are certain.
+KNOWN_BRAND_DOMAINS = {
+    "facebookmail.com": "facebook.com",      # Meta's notification mail
+    "amazonses.com": "amazon.com",           # Amazon SES, Amazon's mail service
+    "googlemail.com": "google.com",          # Google's alternate mail domain
+    "microsoftonline.com": "microsoft.com",  # Microsoft 365 sign-in and mail
+    "office365.com": "microsoft.com",        # Microsoft 365
+}
+
+
+def known_brand_domain(domain: str) -> str:
+    """The brand a genuine mail domain belongs to, or "" if it is not on the list.
+
+    Matches the domain itself or a subdomain of it ("e.facebookmail.com"), never a
+    domain that merely contains the name ("evilfacebookmail.com",
+    "facebookmail.com.evil.xyz").
+    """
+    host = (domain or "").lower().strip(".")
+    for known, brand in KNOWN_BRAND_DOMAINS.items():
+        if host == known or host.endswith("." + known):
+            return brand
+    return ""
+
+
 def get_brand_root(domain: str) -> str:
     """
     Strip the TLD/subdomain noise to get the 'core' brand name for
